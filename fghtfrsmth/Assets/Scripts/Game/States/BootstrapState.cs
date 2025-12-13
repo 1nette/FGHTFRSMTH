@@ -1,9 +1,9 @@
 using Game;
-using UnityEngine;
 
 public class BootstrapState : IState
 {
     private const string InitialSceneName = "Initial";
+    private const string MainSceneName = "Main";
     private readonly GameStateMachine _stateMachine;
     private readonly SceneLoader _sceneLoader;
     
@@ -21,7 +21,7 @@ public class BootstrapState : IState
 
     private void EnterLoadLevel()
     {
-        
+        _stateMachine.Enter<LoadLevelState, string>("Main");
     }
 
     private void RegisterServices()

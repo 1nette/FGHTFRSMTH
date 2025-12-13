@@ -4,21 +4,34 @@ using Game;
 
 public class GameStateMachine
 {
-    private readonly Dictionary<Type, IState> _states;
-    private IState _currentState;
+    private readonly Dictionary<Type, IExitableState> _states;
+    private IExitableState _currentState;
 
     public GameStateMachine(SceneLoader sceneLoader)
     {
-        _states = new Dictionary<Type, IState>()
+        _states = new Dictionary<Type, IExitableState>()
         {
-            [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader)
+            [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader),
+            [typeof(LoadLevelState)] = new LoadLevelState(this, sceneLoader)
         };
     }
 
-    public void Enter<TState>() where TState : IState
+    public void Enter<TState>() where TState : class, IState
     {
         _currentState?.OnExit();
-        _currentState = _states[typeof(TState)];
-        _currentState.OnEnter();
+        IState state = GetState<TState>();
+        _currentState = state;
+        state.OnEnter();
     }
+
+    public void Enter<TState, TPayload>(TPayload payload) where TState : class, IPayloadedState<TPayload>
+    {
+        _currentState?.OnExit();
+        IPayloadedState<TPayload> state = GetState<TState>();
+        _currentState = state;
+        state.OnEnter(payload);
+    }
+
+    private TState GetState<TState>() where TState : class, IExitableState =>
+        _states[typeof(TState)] as TState;
 }

@@ -1,37 +1,39 @@
 using System;
 using System.Collections.Generic;
-using Game;
 
-public class GameStateMachine
+namespace Game.States
 {
-    private readonly Dictionary<Type, IExitableState> _states;
-    private IExitableState _currentState;
-
-    public GameStateMachine(SceneLoader sceneLoader)
+    public class GameStateMachine
     {
-        _states = new Dictionary<Type, IExitableState>()
+        private readonly Dictionary<Type, IExitableState> _states;
+        private IExitableState _currentState;
+
+        public GameStateMachine(SceneLoader sceneLoader)
         {
-            [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader),
-            [typeof(LoadLevelState)] = new LoadLevelState(this, sceneLoader)
-        };
-    }
+            _states = new Dictionary<Type, IExitableState>()
+            {
+                [typeof(BootstrapState)] = new BootstrapState(this, sceneLoader),
+                [typeof(LoadLevelState)] = new LoadLevelState(this, sceneLoader)
+            };
+        }
 
-    public void Enter<TState>() where TState : class, IState
-    {
-        _currentState?.OnExit();
-        IState state = GetState<TState>();
-        _currentState = state;
-        state.OnEnter();
-    }
+        public void Enter<TState>() where TState : class, IState
+        {
+            _currentState?.OnExit();
+            IState state = GetState<TState>();
+            _currentState = state;
+            state.OnEnter();
+        }
 
-    public void Enter<TState, TPayload>(TPayload payload) where TState : class, IPayloadedState<TPayload>
-    {
-        _currentState?.OnExit();
-        IPayloadedState<TPayload> state = GetState<TState>();
-        _currentState = state;
-        state.OnEnter(payload);
-    }
+        public void Enter<TState, TPayload>(TPayload payload) where TState : class, IPayloadedState<TPayload>
+        {
+            _currentState?.OnExit();
+            IPayloadedState<TPayload> state = GetState<TState>();
+            _currentState = state;
+            state.OnEnter(payload);
+        }
 
-    private TState GetState<TState>() where TState : class, IExitableState =>
-        _states[typeof(TState)] as TState;
+        private TState GetState<TState>() where TState : class, IExitableState =>
+            _states[typeof(TState)] as TState;
+    }
 }

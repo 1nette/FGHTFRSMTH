@@ -1,14 +1,17 @@
-public interface IState : IExitableState
+namespace Game.States
 {
-    public void OnEnter();
-}
+    public interface IState : IExitableState
+    {
+        public void OnEnter();
+    }
 
-public interface IPayloadedState<TPayload> : IExitableState
-{
-    public void OnEnter(TPayload payload);
-}
+    public interface IPayloadedState<TPayload> : IExitableState
+    {
+        public void OnEnter(TPayload payload);
+    }
 
-public interface IExitableState
-{
-    public void OnExit();
+    public interface IExitableState
+    {
+        public void OnExit();
+    }
 }
